@@ -45,7 +45,8 @@ Route::post('/households/{householdId}/housing-condition', [App\Http\Controllers
 Route::apiResource('fertilities', App\Http\Controllers\FertilityController::class);
 Route::get('fertilities/person/{person_id}', [App\Http\Controllers\FertilityController::class, 'getByPerson']);
 
-
+Route::apiResource('agricultural-activities', App\Http\Controllers\AgriculturalActivityController::class);
+Route::get('agricultural-activities/household/{household_id}', [App\Http\Controllers\AgriculturalActivityController::class, 'getByHousehold']);
 
 // Education Routes
 Route::get('/persons/{personId}/education', [App\Http\Controllers\EducationController::class, 'show']);

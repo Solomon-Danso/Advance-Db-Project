@@ -181,7 +181,7 @@ const handleSubmit = async (e, section) => {
 };
 
 
-  const handleDelete = async (section, code) => {
+  const handleDelete1 = async (section, code) => {
     if (!confirm(`Are you sure you want to delete this ${section}?`)) return;
 
     try {
@@ -216,6 +216,48 @@ const handleSubmit = async (e, section) => {
       showToast(error.response?.data?.message || 'Failed to delete data', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+    const handleDelete = async (section, code) => {
+    if (!confirm(`Are you sure you want to delete this ${section}?`)) return;
+
+    try {
+      setLoading(true);
+      let endpoint = '';
+      
+      
+      switch (section) {
+        case 'region':
+          endpoint = `/geographic/regions/${code}`;
+          break;
+        case 'district':
+          endpoint = `/geographic/districts/${code}`;
+          break;
+        case 'subDistrict':
+          endpoint = `/geographic/subdistricts/${code}`;
+          break;
+        case 'locality':
+          endpoint = `/geographic/localities/${code}`;
+          break;
+        case 'enumerationArea':
+          endpoint = `/geographic/enumeration-areas/${code}`;
+          break;
+        default:
+          break;
+      }
+
+
+      await apiClient.request('DELETE', endpoint);
+      showToast(`${section.charAt(0).toUpperCase() + section.slice(1)} deleted successfully!`);
+      
+    } catch (error) {
+      console.error('Error deleting data:', error);
+      showToast(error.response?.data?.message || 'Failed to delete data', 'error');
+    } finally {
+      householdData()
+      setLoading(false);
+      
     }
   };
 

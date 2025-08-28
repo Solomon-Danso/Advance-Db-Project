@@ -1,5 +1,5 @@
 "use client"
-import DataViewPage from '@/Pages/View'
+import DataEntryPage from '@/Pages/Entry'
 import React from 'react'
 
 
@@ -9,7 +9,7 @@ const page = () => {
     <div>
 
 
-<DataViewPage/>
+<DataEntryPage/>
 
 
 

@@ -171,6 +171,7 @@ const [bulkEducation, setbulkEducation] = useState([]);
 const [bulkEconomic, setbulkEconomic] = useState([]);
 const [bulkDisability, setbulkDisability] = useState([]);
 const [bulkFertility, setbulkFertility] = useState([]);
+const [bulkAgricultural, setbulkAgricultural] = useState([]);
 
 
 
@@ -196,6 +197,11 @@ const disabilityData = await apiClient.request('GET', '/disabilities');
 
 const fertilityData = await apiClient.request('GET', '/fertilities');
  setbulkFertility(fertilityData || []);
+
+const agricultureData = await apiClient.request('GET', '/agricultural-activities');
+ setbulkAgricultural(agricultureData || []);
+
+
 
 
 
@@ -307,6 +313,15 @@ const handleTabChange = (tab) => {
         setHouseholds(prev => [...prev, household]);
         return;
       }
+
+       if (activeTab === 'agriculture') {
+        const household = await apiClient.request('POST', '/agricultural-activities', formData.agriculture);
+        showToast('Agriculture created successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+     
 
       // For person-related data, we need a household ID
       if (!formData.household.household_id && activeTab !== 'household') {
@@ -427,6 +442,15 @@ const handleTabChange = (tab) => {
         return;
       }
 
+
+       if (activeTab === 'agriculture') {
+        const household = await apiClient.request('PUT', `/agricultural-activities/${code}`, formData.agriculture);
+        showToast('Agriculture updated successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+      
       
       
 
@@ -546,6 +570,10 @@ const handleTabChange = (tab) => {
           endpoint = `/fertilities/${code}`;
           break;
 
+           case 'agriculture':
+          endpoint = `/agricultural-activities/${code}`;
+          break;
+
           
 
 
@@ -582,6 +610,7 @@ const handleTabChange = (tab) => {
             </button>
           ))}
         </div>
+        <div onClick={()=>{router.push("/GeoData")}}>Enter Geographic Data</div>
       </div>
 
       <div className="main-content">
@@ -1967,6 +1996,113 @@ const handleTabChange = (tab) => {
 
 
 
+{activeTab === 'agriculture' && (
+  <div className="form-section">
+    <h3>Agricultural Activity Information</h3>
+    <div className="form-grid">
+      {/* Household ID */}
+      <div className="form-group">
+        <label>Household</label>
+        <select
+          name="household_id"
+          value={formData.agriculture.household_id}
+          onChange={(e) => handleChange(e, 'agriculture')}
+          required
+        >
+          <option value="">Select Household</option>
+          {bulkHousehold.map(household => (
+            <option key={household.household_id} value={household.household_id}>
+              {household.household_id} - {household.detailed_address}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Engaged in Agriculture */}
+      <div className="form-group checkbox-group">
+        <label>
+          <input
+            type="checkbox"
+            name="engaged_in_agriculture"
+            checked={formData.agriculture.engaged_in_agriculture || false}
+            onChange={(e) => handleChange(e, 'agriculture')}
+          />
+          Engaged in Agriculture
+        </label>
+      </div>
+
+      {/* Agricultural Activities */}
+      <div className="form-group checkbox-group">
+        <label>Agricultural Activities:</label>
+        <div className="checkbox-grid">
+          <label>
+            <input
+              type="checkbox"
+              name="crop_farming"
+              checked={formData.agriculture.crop_farming || false}
+              onChange={(e) => handleChange(e, 'agriculture')}
+            />
+            Crop Farming
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="tree_growing"
+              checked={formData.agriculture.tree_growing || false}
+              onChange={(e) => handleChange(e, 'agriculture')}
+            />
+            Tree Growing
+          </label>
+          <label>
+            <input
+              type="checkbox"
+            name="livestock_rearing"
+            checked={formData.agriculture.livestock_rearing || false}
+            onChange={(e) => handleChange(e, 'agriculture')}
+          />
+          Livestock Rearing
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="fish_farming"
+            checked={formData.agriculture.fish_farming || false}
+            onChange={(e) => handleChange(e, 'agriculture')}
+          />
+          Fish Farming
+        </label>
+      </div>
+    </div>
+
+    {/* Number of People Engaged */}
+    <div className="form-group">
+      <label>Males Engaged in Agriculture</label>
+      <input
+        type="number"
+        name="male_engaged"
+        value={formData.agriculture.male_engaged}
+        onChange={(e) => handleChange(e, 'agriculture')}
+        min="0"
+        placeholder="Number of males engaged"
+      />
+    </div>
+
+    <div className="form-group">
+      <label>Females Engaged in Agriculture</label>
+      <input
+        type="number"
+        name="female_engaged"
+        value={formData.agriculture.female_engaged}
+        onChange={(e) => handleChange(e, 'agriculture')}
+        min="0"
+        placeholder="Number of females engaged"
+      />
+    </div>
+  </div>
+
+ 
+</div>
+)}
 
 
  
@@ -2405,6 +2541,72 @@ const handleTabChange = (tab) => {
     </div>
   </>
         )}
+
+
+        {activeTab === 'agriculture' && (
+  <>
+    <div className="data-table">
+      <h4>Existing Agricultural Activities</h4>
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Household ID</th>
+              <th>Engaged</th>
+              <th>Activities</th>
+              <th>Males Engaged</th>
+              <th>Females Engaged</th>
+              <th>Total Engaged</th>
+              <th>Update</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bulkAgricultural.map(activity => (
+              <tr key={activity.agriculture_id}>
+                <td>{activity.household_id}</td>
+                <td>{activity.engaged_in_agriculture ? 'Yes' : 'No'}</td>
+                <td>
+                  {[
+                    activity.crop_farming && 'Crops',
+                    activity.tree_growing && 'Trees',
+                    activity.livestock_rearing && 'Livestock',
+                    activity.fish_farming && 'Fish'
+                  ].filter(Boolean).join(', ') || 'None'}
+                </td>
+                <td>{activity.male_engaged || 0}</td>
+                <td>{activity.female_engaged || 0}</td>
+                <td>{(activity.male_engaged || 0) + (activity.female_engaged || 0)}</td>
+               
+          <td>
+              <button
+              onClick={() => handleUpdate( activity.agriculture_id)}
+              className="delete-button"
+              style={{ backgroundColor: 'green' }}
+              >
+              Update
+              </button>
+              </td>
+              <td>
+              <button
+              onClick={() => handleDelete('agriculture', activity.agriculture_id)}
+              className="delete-button"
+
+              >
+              Delete
+              </button>
+              </td>
+
+
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </>
+)}
+
 
 
 
