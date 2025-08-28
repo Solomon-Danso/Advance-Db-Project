@@ -82,7 +82,7 @@ const [regions, setRegions] = useState([]);
       highest_grade_completed: 1
     },
     // Economic Activity
-    economic_activity: {
+    economic: {
       engaged_in_activity: true,
       engagement_status: 'Employee',
       reason_not_seeking_work: '',
@@ -134,25 +134,6 @@ const [regions, setRegions] = useState([]);
   const [toast, setToast] = useState(null);
   const router = useRouter();
 
-  // useEffect(() => {
-  //   const fetchInitialData = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const [eas, hhs] = await Promise.all([
-  //         apiClient.request('GET', '/enumeration-areas'),
-  //         apiClient.request('GET', '/households?per_page=100')
-  //       ]);
-  //       setEnumerationAreas(eas);
-  //       setHouseholds(hhs.data);
-  //     } catch (error) {
-  //       showToast('Failed to load initial data', 'error');
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchInitialData();
-  // }, []);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -172,17 +153,7 @@ const [regions, setRegions] = useState([]);
     }));
   };
 
-  const handleNumberChange = (e, section) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [name]: value === '' ? '' : Number(value)
-      }
-    }));
-  };
-
+ 
 useEffect(() => {
   // Load initial data for the first tab
   loadTabData(activeTab);
@@ -197,6 +168,9 @@ const [bulkHousehold, setBulkHousehold] = useState([]);
 const [bulkHousing, setBulkHousing] = useState([]);
 const [bulkPerson, setBulkPerson] = useState([]);
 const [bulkEducation, setbulkEducation] = useState([]);
+const [bulkEconomic, setbulkEconomic] = useState([]);
+const [bulkDisability, setbulkDisability] = useState([]);
+const [bulkFertility, setbulkFertility] = useState([]);
 
 
 
@@ -211,9 +185,17 @@ const householdData = async () => {
  const personData = await apiClient.request('GET', '/persons');
  setBulkPerson(personData || []);
 
-const educationData = await apiClient.request('GET', '/persons');
+const educationData = await apiClient.request('GET', '/education');
  setbulkEducation(educationData || []);
 
+const economicData = await apiClient.request('GET', '/economic-activities');
+ setbulkEconomic(economicData || []);
+
+const disabilityData = await apiClient.request('GET', '/disabilities');
+ setbulkDisability(disabilityData || []);
+
+const fertilityData = await apiClient.request('GET', '/fertilities');
+ setbulkFertility(fertilityData || []);
 
 
 
@@ -300,6 +282,28 @@ const handleTabChange = (tab) => {
       if (activeTab === 'education') {
         const household = await apiClient.request('POST', '/education', formData.education);
         showToast('Education created successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+       if (activeTab === 'economic') {
+        const household = await apiClient.request('POST', '/economic-activities', formData.economic);
+        showToast('Economic created successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+       if (activeTab === 'disability') {
+        const household = await apiClient.request('POST', '/disabilities', formData.disability);
+        showToast('Disability created successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+
+       if (activeTab === 'fertility') {
+        const household = await apiClient.request('POST', '/fertilities', formData.fertility);
+        showToast('Fertility created successfully!');
         setHouseholds(prev => [...prev, household]);
         return;
       }
@@ -396,11 +400,35 @@ const handleTabChange = (tab) => {
       }
 
       if (activeTab === 'education') {
-        const household = await apiClient.request('POST', '/education', formData.education);
+        const household = await apiClient.request('PUT', `/education/${code}`, formData.education);
         showToast('Education updated successfully!');
         setHouseholds(prev => [...prev, household]);
         return;
       }
+
+      if (activeTab === 'economic') {
+        const household = await apiClient.request('PUT', `/economic-activities/${code}`, formData.economic);
+        showToast('Economic updated successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+       if (activeTab === 'disability') {
+        const household = await apiClient.request('PUT', `/disabilities/${code}`, formData.disability);
+        showToast('Economic updated successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+       if (activeTab === 'fertility') {
+        const household = await apiClient.request('PUT', `/fertilities/${code}`, formData.fertility);
+        showToast('Fertility updated successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+      
+      
 
       // For person-related data, we need a household ID
       if (!formData.household.household_id && activeTab !== 'household') {
@@ -468,10 +496,10 @@ const handleTabChange = (tab) => {
 
   const tabs = [
     { id: 'household', label: 'Household' },
-     { id: 'housing', label: 'Housing Condition' },
+    { id: 'housing', label: 'Housing Condition' },
     { id: 'person', label: 'Person' },
     { id: 'education', label: 'Education' },
-    { id: 'economic_activity', label: 'Economic Activity' },
+    { id: 'economic', label: 'Economic Activity' },
     { id: 'disability', label: 'Disability' },
     { id: 'fertility', label: 'Fertility' },
     { id: 'agriculture', label: 'Agriculture' }
@@ -501,6 +529,26 @@ const handleTabChange = (tab) => {
         case 'enumerationArea':
           endpoint = `/geographic/enumeration-areas/${code}`;
           break;
+
+        case 'education':
+          endpoint = `/education/${code}`;
+          break;
+
+        case 'economic':
+          endpoint = `/economic-activities/${code}`;
+          break;
+
+         case 'disability':
+          endpoint = `/disabilities/${code}`;
+          break;
+
+        case 'fertility':
+          endpoint = `/fertilities/${code}`;
+          break;
+
+          
+
+
         default:
           break;
       }
@@ -1480,40 +1528,443 @@ const handleTabChange = (tab) => {
       </div>
     </div>
 
-    {/* Add Update and Delete buttons */}
-    <div className="form-actions">
-      <button 
-        type="button" 
-        className="btn-primary"
-        onClick={() => handleSave('education')}
-      >
-        {editingEducationId ? 'Update Education' : 'Add Education'}
-      </button>
-      
-      {editingEducationId && (
-        <button 
-          type="button" 
-          className="btn-secondary"
-          onClick={() => {
-            setEditingEducationId(null);
-            setFormData(prev => ({
-              ...prev,
-              education: {
-                person_id: '',
-                literacy_language: '',
-                ever_attended_school: false,
-                highest_level_schooling: '',
-                highest_grade_completed: ''
-              }
-            }));
-          }}
-        >
-          Cancel Edit
-        </button>
-      )}
-    </div>
+
   </div>
-)}
+          )}
+
+          {activeTab === 'economic' && (
+  <div className="form-section">
+    <h3>Economic Activity Information</h3>
+    <div className="form-grid">
+      {/* Person ID */}
+      <div className="form-group">
+        <label>Person</label>
+        <select
+          name="person_id"
+          value={formData.economic.person_id}
+          onChange={(e) => handleChange(e, 'economic')}
+          required
+        >
+          <option value="">Select Person</option>
+          {bulkPerson.map(person => (
+            <option key={person.person_id} value={person.person_id}>
+              {person.full_name} (HH: {person.household_id})
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Engaged in Activity */}
+      <div className="form-group checkbox-group">
+        <label>
+          <input
+            type="checkbox"
+            name="engaged_in_activity"
+            checked={formData.economic.engaged_in_activity || false}
+            onChange={(e) => handleChange(e, 'economic')}
+          />
+          Engaged in Economic Activity
+        </label>
+      </div>
+
+      {/* Engagement Status */}
+      <div className="form-group">
+        <label>Engagement Status</label>
+        <select
+          name="engagement_status"
+          value={formData.economic.engagement_status}
+          onChange={(e) => handleChange(e, 'economic')}
+          required
+        >
+          <option value="">Select Engagement Status</option>
+          <option value="Did not work but had job to go back to">Did not work but had job to go back to</option>
+          <option value="Seeking work for the first time and available">Seeking work for the first time and available</option>
+          <option value="Did voluntary work without pay">Did voluntary work without pay</option>
+          <option value="Did not work and not seeking work">Did not work and not seeking work</option>
+        </select>
+      </div>
+
+      {/* Reason Not Seeking Work */}
+      <div className="form-group">
+        <label>Reason Not Seeking Work</label>
+        <select
+          name="reason_not_seeking_work"
+          value={formData.economic.reason_not_seeking_work}
+          onChange={(e) => handleChange(e, 'economic')}
+        >
+          <option value="">Select Reason</option>
+          <option value="Did home duties">Did home duties</option>
+          <option value="In full time education">In full time education</option>
+          <option value="Pensioner/Retiree">Pensioner/Retiree</option>
+          <option value="Disabled/sick to work">Disabled/sick to work</option>
+          <option value="Too old/too young">Too old/too young</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      {/* Occupation Code */}
+      <div className="form-group">
+        <label>Occupation Code</label>
+        <input
+          type="text"
+          name="occupation_code"
+          value={formData.economic.occupation_code}
+          onChange={(e) => handleChange(e, 'economic')}
+          maxLength="10"
+        />
+      </div>
+
+      {/* Occupation Description */}
+      <div className="form-group">
+        <label>Occupation Description</label>
+        <input
+          type="text"
+          name="occupation_description"
+          value={formData.economic.occupation_description}
+          onChange={(e) => handleChange(e, 'economic')}
+          maxLength="100"
+        />
+      </div>
+
+      {/* Industry/Establishment Name */}
+      <div className="form-group">
+        <label>Industry/Establishment Name</label>
+        <input
+          type="text"
+          name="industry_establishment_name"
+          value={formData.economic.industry_establishment_name}
+          onChange={(e) => handleChange(e, 'economic')}
+          maxLength="100"
+        />
+      </div>
+
+      {/* Industry/Establishment Location */}
+      <div className="form-group">
+        <label>Industry/Establishment Location</label>
+        <input
+          type="text"
+          name="industry_establishment_location"
+          value={formData.economic.industry_establishment_location}
+          onChange={(e) => handleChange(e, 'economic')}
+          maxLength="100"
+        />
+      </div>
+
+      {/* Industry Product/Service */}
+      <div className="form-group">
+        <label>Industry Product/Service</label>
+        <input
+          type="text"
+          name="industry_product_service"
+          value={formData.economic.industry_product_service}
+          onChange={(e) => handleChange(e, 'economic')}
+          maxLength="100"
+        />
+      </div>
+
+      {/* Employment Status */}
+      <div className="form-group">
+        <label>Employment Status</label>
+        <select
+          name="employment_status"
+          value={formData.economic.employment_status}
+          onChange={(e) => handleChange(e, 'economic')}
+          required
+        >
+          <option value="">Select Employment Status</option>
+          <option value="Employee">Employee</option>
+          <option value="Self employed without employees">Self employed without employees</option>
+          <option value="Self employed with employees">Self employed with employees</option>
+          <option value="Casual worker">Casual worker</option>
+          <option value="Contributing family worker">Contributing family worker</option>
+          <option value="Apprentice">Apprentice</option>
+          <option value="Domestic employee">Domestic employee</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      {/* Employment Sector */}
+      <div className="form-group">
+        <label>Employment Sector</label>
+        <select
+          name="employment_sector"
+          value={formData.economic.employment_sector}
+          onChange={(e) => handleChange(e, 'economic')}
+          required
+        >
+          <option value="">Select Employment Sector</option>
+          <option value="Public (Government)">Public (Government)</option>
+          <option value="Private Formal">Private Formal</option>
+          <option value="Private Informal">Private Informal</option>
+          <option value="Semi-Public/Parastatal">Semi-Public/Parastatal</option>
+          <option value="NGO/Local and International">NGO/Local and International</option>
+          <option value="International Organisation">International Organisation</option>
+        </select>
+      </div>
+    </div>
+
+    
+  </div>
+          )}
+
+
+          {activeTab === 'disability' && (
+            <div className="form-section">
+              <h3>Disability Information</h3>
+              <div className="form-grid">
+                {/* Person ID */}
+                <div className="form-group">
+                  <label>Person</label>
+                  <select
+                    name="person_id"
+                    value={formData.disability.person_id}
+                    onChange={(e) => handleChange(e, 'disability')}
+                    required
+                  >
+                    <option value="">Select Person</option>
+                    {bulkPerson.map(person => (
+                      <option key={person.person_id} value={person.person_id}>
+                        {person.full_name} (HH: {person.household_id})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Has Disability */}
+                <div className="form-group checkbox-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="has_disability"
+                      checked={formData.disability.has_disability || false}
+                      onChange={(e) => handleChange(e, 'disability')}
+                    />
+                    Has Disability
+                  </label>
+                </div>
+
+                {/* Disability Types */}
+                <div className="form-group checkbox-group">
+                  <label>Disability Types:</label>
+                  <div className="checkbox-grid">
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="sight_disability"
+                        checked={formData.disability.sight_disability || false}
+                        onChange={(e) => handleChange(e, 'disability')}
+                      />
+                      Sight Disability
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="hearing_disability"
+                        checked={formData.disability.hearing_disability || false}
+                        onChange={(e) => handleChange(e, 'disability')}
+                      />
+                      Hearing Disability
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="speech_disability"
+                        checked={formData.disability.speech_disability || false}
+                        onChange={(e) => handleChange(e, 'disability')}
+                      />
+                      Speech Disability
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="physical_disability"
+                        checked={formData.disability.physical_disability || false}
+                        onChange={(e) => handleChange(e, 'disability')}
+                      />
+                      Physical Disability
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="intellectual_disability"
+                        checked={formData.disability.intellectual_disability || false}
+                        onChange={(e) => handleChange(e, 'disability')}
+                      />
+                      Intellectual Disability
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="emotional_disability"
+                        checked={formData.disability.emotional_disability || false}
+                        onChange={(e) => handleChange(e, 'disability')}
+                      />
+                      Emotional Disability
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="other_disability"
+                        checked={formData.disability.other_disability || false}
+                        onChange={(e) => handleChange(e, 'disability')}
+                      />
+                      Other Disability
+                    </label>
+                  </div>
+                </div>
+
+                {/* Other Disability Description */}
+                <div className="form-group">
+                  <label>Other Disability Description</label>
+                  <input
+                    type="text"
+                    name="other_disability_description"
+                    value={formData.disability.other_disability_description}
+                    onChange={(e) => handleChange(e, 'disability')}
+                    maxLength="100"
+                    placeholder="Describe other disability"
+                  />
+                </div>
+
+                {/* Technology Access */}
+                <div className="form-group checkbox-group">
+                  <label>Technology Access:</label>
+                  <div className="checkbox-grid">
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="owns_mobile_phone"
+                        checked={formData.disability.owns_mobile_phone || false}
+                        onChange={(e) => handleChange(e, 'disability')}
+                      />
+                      Owns Mobile Phone
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="uses_internet"
+                        checked={formData.disability.uses_internet || false}
+                        onChange={(e) => handleChange(e, 'disability')}
+                      />
+                      Uses Internet
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+
+            
+            </div>
+          )}
+
+
+
+          {activeTab === 'fertility' && (
+            <div className="form-section">
+              <h3>Fertility Information</h3>
+              <div className="form-grid">
+                {/* Person ID */}
+                <div className="form-group">
+                  <label>Person</label>
+                  <select
+                    name="person_id"
+                    value={formData.fertility.person_id}
+                    onChange={(e) => handleChange(e, 'fertility')}
+                    required
+                  >
+                    <option value="">Select Person</option>
+                    {bulkPerson.map(person => (
+                      <option key={person.person_id} value={person.person_id}>
+                        {person.full_name} (HH: {person.household_id})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Children Ever Born - Male */}
+                <div className="form-group">
+                  <label>Children Ever Born (Male)</label>
+                  <input
+                    type="number"
+                    name="children_ever_born_male"
+                    value={formData.fertility.children_ever_born_male}
+                    onChange={(e) => handleChange(e, 'fertility')}
+                    min="0"
+                    placeholder="Number of male children ever born"
+                  />
+                </div>
+
+                {/* Children Ever Born - Female */}
+                <div className="form-group">
+                  <label>Children Ever Born (Female)</label>
+                  <input
+                    type="number"
+                    name="children_ever_born_female"
+                    value={formData.fertility.children_ever_born_female}
+                    onChange={(e) => handleChange(e, 'fertility')}
+                    min="0"
+                    placeholder="Number of female children ever born"
+                  />
+                </div>
+
+                {/* Children Surviving - Male */}
+                <div className="form-group">
+                  <label>Children Surviving (Male)</label>
+                  <input
+                    type="number"
+                    name="children_surviving_male"
+                    value={formData.fertility.children_surviving_male}
+                    onChange={(e) => handleChange(e, 'fertility')}
+                    min="0"
+                    placeholder="Number of male children surviving"
+                  />
+                </div>
+
+                {/* Children Surviving - Female */}
+                <div className="form-group">
+                  <label>Children Surviving (Female)</label>
+                  <input
+                    type="number"
+                    name="children_surviving_female"
+                    value={formData.fertility.children_surviving_female}
+                    onChange={(e) => handleChange(e, 'fertility')}
+                    min="0"
+                    placeholder="Number of female children surviving"
+                  />
+                </div>
+
+                {/* Children Born Past 12 Months - Male */}
+                <div className="form-group">
+                  <label>Children Born Past 12 Months (Male)</label>
+                  <input
+                    type="number"
+                    name="children_born_past_12_months_male"
+                    value={formData.fertility.children_born_past_12_months_male}
+                    onChange={(e) => handleChange(e, 'fertility')}
+                    min="0"
+                    placeholder="Male children born in past 12 months"
+                  />
+                </div>
+
+                {/* Children Born Past 12 Months - Female */}
+                <div className="form-group">
+                  <label>Children Born Past 12 Months (Female)</label>
+                  <input
+                    type="number"
+                    name="children_born_past_12_months_female"
+                    value={formData.fertility.children_born_past_12_months_female}
+                    onChange={(e) => handleChange(e, 'fertility')}
+                    min="0"
+                    placeholder="Female children born in past 12 months"
+                  />
+                </div>
+              </div>
+
+             
+            </div>
+          )}
+
+
 
 
 
@@ -1722,7 +2173,8 @@ const handleTabChange = (tab) => {
               <th>Attended School</th>
               <th>Highest Level</th>
               <th>Highest Grade</th>
-              <th>Actions</th>
+              <th>Update</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>
@@ -1733,20 +2185,28 @@ const handleTabChange = (tab) => {
                 <td>{education.ever_attended_school ? 'Yes' : 'No'}</td>
                 <td>{education.highest_level_schooling}</td>
                 <td>{education.highest_grade_completed || 'N/A'}</td>
-                <td>
+               
+              <td>
                   <button
-                    onClick={() => handleEdit('education', education)}
-                    className="edit-button"
+                    onClick={() => handleUpdate(education.education_id)}
+                    className="delete-button"
+                    style={{ backgroundColor: 'green' }}
                   >
-                    Edit
+                    Update
                   </button>
+                </td>
+                <td>
                   <button
                     onClick={() => handleDelete('education', education.education_id)}
                     className="delete-button"
+                   
                   >
                     Delete
                   </button>
                 </td>
+
+
+
               </tr>
             ))}
           </tbody>
@@ -1754,7 +2214,197 @@ const handleTabChange = (tab) => {
       </div>
     </div>
   </>
-)}
+        )}
+
+        {activeTab === 'economic' && (
+          <>
+            <div className="data-table">
+              <h4>Existing Economic Activities</h4>
+              <div className="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Person Name</th>
+                      <th>Engaged</th>
+                      <th>Engagement Status</th>
+                      <th>Employment Status</th>
+                      <th>Employment Sector</th>
+                      <th>Occupation</th>
+                      <th>Update</th>
+                      <th>Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bulkEconomic.map(activity => (
+                      <tr key={activity.activity_id}>
+                        <td>{activity.full_name}</td>
+                        <td>{activity.engaged_in_activity ? 'Yes' : 'No'}</td>
+                        <td>{activity.engagement_status}</td>
+                        <td>{activity.employment_status}</td>
+                        <td>{activity.employment_sector}</td>
+                        <td>{activity.occupation_description || activity.occupation_code || 'N/A'}</td>
+                        <td>
+                          <button
+                            onClick={() => handleUpdate(activity.activity_id)}
+                            className="delete-button"
+                            style={{ backgroundColor: 'green' }}
+                          >
+                            Update
+                          </button>
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => handleDelete('economic', activity.activity_id)}
+                            className="delete-button"
+                          
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeTab === 'disability' && (
+          <>
+            <div className="data-table">
+              <h4>Existing Disability Records</h4>
+              <div className="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Person Name</th>
+                      <th>Has Disability</th>
+                      <th>Disability Types</th>
+                      <th>Mobile Phone</th>
+                      <th>Internet Use</th>
+                      <th>Update</th>
+                      <th>Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bulkDisability.map(disability => (
+                      <tr key={disability.disability_id}>
+                        <td>{disability.full_name}</td>
+                        <td>{disability.has_disability ? 'Yes' : 'No'}</td>
+                        <td>
+                          {[
+                            disability.sight_disability && 'Sight',
+                            disability.hearing_disability && 'Hearing',
+                            disability.speech_disability && 'Speech',
+                            disability.physical_disability && 'Physical',
+                            disability.intellectual_disability && 'Intellectual',
+                            disability.emotional_disability && 'Emotional',
+                            disability.other_disability && 'Other'
+                          ].filter(Boolean).join(', ') || 'None'}
+                        </td>
+                        <td>{disability.owns_mobile_phone ? 'Yes' : 'No'}</td>
+                        <td>{disability.uses_internet ? 'Yes' : 'No'}</td>
+                        
+                          <td>
+                          <button
+                            onClick={() => handleUpdate(disability.disability_id)}
+                            className="delete-button"
+                            style={{ backgroundColor: 'green' }}
+                          >
+                            Update
+                          </button>
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => handleDelete('disability', disability.disability_id)}
+                            className="delete-button"
+                          
+                          >
+                            Delete
+                          </button>
+                        </td>
+
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeTab === 'fertility' && (
+  <>
+    <div className="data-table">
+      <h4>Existing Fertility Records</h4>
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Person Name</th>
+              <th>Sex</th>
+              <th>Children Ever Born</th>
+              <th>Children Surviving</th>
+              <th>Born Past 12 Months</th>
+              <th>Update</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bulkFertility.map(fertility => (
+              <tr key={fertility.fertility_id}>
+                <td>{fertility.full_name}</td>
+                <td>{fertility.sex}</td>
+                <td>
+                  {fertility.children_ever_born_male + fertility.children_ever_born_female || 0}
+                  {fertility.children_ever_born_male + fertility.children_ever_born_female > 0 && 
+                    ` (M: ${fertility.children_ever_born_male}, F: ${fertility.children_ever_born_female})`
+                  }
+                </td>
+                <td>
+                  {fertility.children_surviving_male + fertility.children_surviving_female || 0}
+                  {fertility.children_surviving_male + fertility.children_surviving_female > 0 && 
+                    ` (M: ${fertility.children_surviving_male}, F: ${fertility.children_surviving_female})`
+                  }
+                </td>
+                <td>
+                  {fertility.children_born_past_12_months_male + fertility.children_born_past_12_months_female || 0}
+                  {fertility.children_born_past_12_months_male + fertility.children_born_past_12_months_female > 0 && 
+                    ` (M: ${fertility.children_born_past_12_months_male}, F: ${fertility.children_born_past_12_months_female})`
+                  }
+                </td>
+               
+
+              <td>
+              <button
+              onClick={() => handleUpdate(fertility.fertility_id)}
+              className="delete-button"
+              style={{ backgroundColor: 'green' }}
+              >
+              Update
+              </button>
+              </td>
+              <td>
+              <button
+              onClick={() => handleDelete('fertility', fertility.fertility_id)}
+              className="delete-button"
+
+              >
+              Delete
+              </button>
+              </td>
+
+
+
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </>
+        )}
 
 
 

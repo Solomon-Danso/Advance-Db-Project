@@ -32,9 +32,20 @@ Route::get('persons/household/{household_id}', [App\Http\Controllers\PersonContr
 Route::apiResource('education', App\Http\Controllers\EducationController::class);
 Route::get('education/person/{person_id}', [App\Http\Controllers\EducationController::class, 'getByPerson']);
 
+Route::apiResource('economic-activities', App\Http\Controllers\EconomicActivityController::class);
+Route::get('economic-activities/person/{person_id}', [App\Http\Controllers\EconomicActivityController::class, 'getByPerson']);
+
+Route::apiResource('disabilities', App\Http\Controllers\DisabilityController::class);
+Route::get('disabilities/person/{person_id}', [App\Http\Controllers\DisabilityController::class, 'getByPerson']);
+
 // Housing Condition Routes
 Route::get('/households/{householdId}/housing-condition', [App\Http\Controllers\HousingConditionController::class, 'show']);
 Route::post('/households/{householdId}/housing-condition', [App\Http\Controllers\HousingConditionController::class, 'store']);
+
+Route::apiResource('fertilities', App\Http\Controllers\FertilityController::class);
+Route::get('fertilities/person/{person_id}', [App\Http\Controllers\FertilityController::class, 'getByPerson']);
+
+
 
 // Education Routes
 Route::get('/persons/{personId}/education', [App\Http\Controllers\EducationController::class, 'show']);
