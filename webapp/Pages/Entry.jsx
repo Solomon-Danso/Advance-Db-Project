@@ -45,7 +45,7 @@ const [regions, setRegions] = useState([]);
       birth_region_country_name: '',
       lived_in_locality_since_birth: false,
       years_lived_in_locality: '',
-      religion: 'Christian',
+      religion: 'Other Christian',
       marital_status: 'Never married',
       present_on_census_night: true,
       status: 'Usual member present'
@@ -195,10 +195,27 @@ householdData()
 
 const [bulkHousehold, setBulkHousehold] = useState([]);
 const [bulkHousing, setBulkHousing] = useState([]);
+const [bulkPerson, setBulkPerson] = useState([]);
+const [bulkEducation, setbulkEducation] = useState([]);
+
+
+
 
 const householdData = async () => {
  const regionsData = await apiClient.request('GET', '/households');
  setBulkHousehold(regionsData || []);
+
+ const housingData = await apiClient.request('GET', '/housing-conditions');
+ setBulkHousing(housingData || []);
+
+ const personData = await apiClient.request('GET', '/persons');
+ setBulkPerson(personData || []);
+
+const educationData = await apiClient.request('GET', '/persons');
+ setbulkEducation(educationData || []);
+
+
+
 
 }
 
@@ -266,6 +283,27 @@ const handleTabChange = (tab) => {
         return;
       }
 
+      if (activeTab === 'housing') {
+        const household = await apiClient.request('POST', '/housing-conditions', formData.housing);
+        showToast('Housing created successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+      if (activeTab === 'person') {
+        const household = await apiClient.request('POST', '/persons', formData.person);
+        showToast('Person created successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+      if (activeTab === 'education') {
+        const household = await apiClient.request('POST', '/education', formData.education);
+        showToast('Education created successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
       // For person-related data, we need a household ID
       if (!formData.household.household_id && activeTab !== 'household') {
         showToast('Please select a household first', 'error');
@@ -324,8 +362,107 @@ const handleTabChange = (tab) => {
 
     showToast(errorMessage, 'error');
   } finally {
+    householdData()
       setLoading(false);
-        window.location.reload();
+      
+    }
+  };
+
+    const handleUpdate = async (code) => {
+   
+    setLoading(true);
+
+    try {
+      // First create household if we're on that tab
+      if (activeTab === 'household') {
+        const household = await apiClient.request('PUT', `/households/${code}`, formData.household);
+        showToast('Household updated successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+      if (activeTab === 'housing') {
+        const household = await apiClient.request('PUT', `/housing-conditions/${code}`, formData.housing);
+        showToast('Housing updated successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+      if (activeTab === 'person') {
+        const household = await apiClient.request('PUT', `/persons/${code}`, formData.person);
+        showToast('Person updated successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+      if (activeTab === 'education') {
+        const household = await apiClient.request('POST', '/education', formData.education);
+        showToast('Education updated successfully!');
+        setHouseholds(prev => [...prev, household]);
+        return;
+      }
+
+      // For person-related data, we need a household ID
+      if (!formData.household.household_id && activeTab !== 'household') {
+        showToast('Please select a household first', 'error');
+        setActiveTab('household');
+        return;
+      }
+
+      // Submit data based on active tab
+      let endpoint = '';
+      let data = {};
+
+      switch (activeTab) {
+        case 'person':
+          endpoint = '/persons';
+          data = { ...formData.person, household_id: formData.household.household_id };
+          break;
+        case 'housing':
+          endpoint = `/households/${formData.household.household_id}/housing-condition`;
+          data = formData.housing;
+          break;
+        case 'education':
+          endpoint = `/persons/${formData.person.person_id}/education`;
+          data = formData.education;
+          break;
+        // Add cases for other tabs
+        default:
+          break;
+      }
+
+      const response = await apiClient.request('POST', endpoint, data);
+
+      
+      showToast(`${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} data saved successfully!`);
+    
+   
+      // If we just created a person, store the ID for related records
+      if (activeTab === 'person' && !formData.person.person_id) {
+        setFormData(prev => ({
+          ...prev,
+          person: { ...prev.person, person_id: response.id }
+        }));
+      }
+    } catch (error) {
+    console.error('Error saving data:', error);
+
+    let errorMessage = 'Failed to save data';
+
+    if (error.response) {
+      try {
+        const errorData = await error.response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (parseError) {
+        console.error('Error parsing response:', parseError);
+      }
+    }
+
+    showToast(errorMessage, 'error');
+  } finally {
+    householdData()
+      setLoading(false);
+      
     }
   };
 
@@ -352,11 +489,11 @@ const handleTabChange = (tab) => {
         case 'household':
           endpoint = `/deletehouseholds/${code}`;
           break;
-        case 'district':
-          endpoint = `/geographic/districts/${code}`;
+        case 'housing':
+          endpoint = `/housing-conditions/${code}`;
           break;
-        case 'subDistrict':
-          endpoint = `/geographic/subdistricts/${code}`;
+        case 'person':
+          endpoint = `/persons/${code}`;
           break;
         case 'locality':
           endpoint = `/geographic/localities/${code}`;
@@ -375,8 +512,9 @@ const handleTabChange = (tab) => {
       console.error('Error deleting data:', error);
       showToast(error.response?.data?.message || 'Failed to delete data', 'error');
     } finally {
+      householdData()
       setLoading(false);
-      window.location.reload();
+      
     }
   };
 
@@ -552,7 +690,7 @@ const handleTabChange = (tab) => {
           <option value="">Select Household</option>
           {bulkHousehold.map(household => (
             <option key={household.household_id} value={household.household_id}>
-              {household.household_id} - {household.detailed_address}
+              {household.household_number} - {household.structure_number}
             </option>
           ))}
         </select>
@@ -971,32 +1109,29 @@ const handleTabChange = (tab) => {
 
 
 
-
- 
-
-          {/* Person Tab */}
           {activeTab === 'person' && (
             <div className="form-section">
               <h3>Person Information</h3>
-              
-              <div className="form-group">
-                <label>Household</label>
-                <select
-                  name="household_id"
-                  value={formData.household.household_id}
-                  onChange={(e) => handleChange(e, 'household')}
-                  required
-                >
-                  <option value="">Select Household</option>
-                  {households.map(hh => (
-                    <option key={hh.household_id} value={hh.household_id}>
-                      {hh.structure_number}/{hh.household_number} - {hh.ea_code}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               <div className="form-grid">
+                {/* Household ID */}
+                <div className="form-group">
+                  <label>Household</label>
+                  <select
+                    name="household_id"
+                    value={formData.person.household_id}
+                    onChange={(e) => handleChange(e, 'person')}
+                    required
+                  >
+                    <option value="">Select Household</option>
+                    {bulkHousehold.map(household => (
+                      <option key={household.household_id} value={household.household_id}>
+                        {household.household_id} - {household.detailed_address}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Full Name */}
                 <div className="form-group">
                   <label>Full Name</label>
                   <input
@@ -1008,12 +1143,384 @@ const handleTabChange = (tab) => {
                   />
                 </div>
 
-                {/* Add all other person fields following the same pattern */}
+                {/* Relationship to Head */}
+                <div className="form-group">
+                  <label>Relationship to Head</label>
+                  <select
+                    name="relationship_to_head"
+                    value={formData.person.relationship_to_head}
+                    onChange={(e) => handleChange(e, 'person')}
+                    required
+                  >
+                    <option value="">Select Relationship</option>
+                    <option value="Head">Head</option>
+                    <option value="Spouse">Spouse</option>
+                    <option value="Child">Child</option>
+                    <option value="Parent/Parent in-law">Parent/Parent in-law</option>
+                    <option value="Son/Daughter in-law">Son/Daughter in-law</option>
+                    <option value="Grandchild">Grandchild</option>
+                    <option value="Brother/Sister">Brother/Sister</option>
+                    <option value="Step child">Step child</option>
+                    <option value="Foster child">Foster child</option>
+                    <option value="Other relative">Other relative</option>
+                    <option value="Non-relative">Non-relative</option>
+                  </select>
+                </div>
+
+                {/* Sex */}
+                <div className="form-group">
+                  <label>Sex</label>
+                  <select
+                    name="sex"
+                    value={formData.person.sex}
+                    onChange={(e) => handleChange(e, 'person')}
+                    required
+                  >
+                    <option value="">Select Sex</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+
+                {/* Date of Birth */}
+                <div className="form-group">
+                  <label>Date of Birth</label>
+                  <input
+                    type="date"
+                    name="date_of_birth"
+                    value={formData.person.date_of_birth}
+                    onChange={(e) => handleChange(e, 'person')}
+                  />
+                </div>
+
+                {/* Age */}
+                <div className="form-group">
+                  <label>Age</label>
+                  <input
+                    type="number"
+                    name="age"
+                    value={formData.person.age}
+                    onChange={(e) => handleChange(e, 'person')}
+                    min="0"
+                    max="120"
+                  />
+                </div>
+
+                {/* Nationality */}
+                <div className="form-group">
+                  <label>Nationality</label>
+                  <select
+                    name="nationality"
+                    value={formData.person.nationality}
+                    onChange={(e) => handleChange(e, 'person')}
+                    required
+                  >
+                    <option value="">Select Nationality</option>
+                    <option value="Ghanaian by birth">Ghanaian by birth</option>
+                    <option value="Dual Nationality">Dual Nationality</option>
+                    <option value="Ghanaian by naturalization">Ghanaian by naturalization</option>
+                    <option value="Nigerian">Nigerian</option>
+                    <option value="Liberian">Liberian</option>
+                    <option value="Sierra Leonean">Sierra Leonean</option>
+                    <option value="Gambian">Gambian</option>
+                    <option value="Togolese">Togolese</option>
+                    <option value="Burkinabe">Burkinabe</option>
+                    <option value="Ivorian">Ivorian</option>
+                    <option value="Other ECOWAS National">Other ECOWAS National</option>
+                    <option value="African, other than ECOWAS">African, other than ECOWAS</option>
+                    <option value="European">European</option>
+                    <option value="American">American</option>
+                    <option value="Asian">Asian</option>
+                    <option value="Oceanian">Oceanian</option>
+                  </select>
+                </div>
+
+                {/* Ethnicity Code */}
+                <div className="form-group">
+                  <label>Ethnicity Code</label>
+                  <input
+                    type="text"
+                    name="ethnicity_code"
+                    value={formData.person.ethnicity_code}
+                    onChange={(e) => handleChange(e, 'person')}
+                    maxLength="10"
+                  />
+                </div>
+
+                {/* Ethnicity Name */}
+                <div className="form-group">
+                  <label>Ethnicity Name</label>
+                  <input
+                    type="text"
+                    name="ethnicity_name"
+                    value={formData.person.ethnicity_name}
+                    onChange={(e) => handleChange(e, 'person')}
+                    maxLength="50"
+                  />
+                </div>
+
+                {/* Born in Locality */}
+                <div className="form-group checkbox-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="born_in_locality"
+                      checked={formData.person.born_in_locality || false}
+                      onChange={(e) => handleChange(e, 'person')}
+                    />
+                    Born in Locality
+                  </label>
+                </div>
+
+                {/* Birth Region Country Code */}
+                <div className="form-group">
+                  <label>Birth Region Country Code</label>
+                  <input
+                    type="text"
+                    name="birth_region_country_code"
+                    value={formData.person.birth_region_country_code}
+                    onChange={(e) => handleChange(e, 'person')}
+                    maxLength="10"
+                  />
+                </div>
+
+                {/* Birth Region Country Name */}
+                <div className="form-group">
+                  <label>Birth Region Country Name</label>
+                  <input
+                    type="text"
+                    name="birth_region_country_name"
+                    value={formData.person.birth_region_country_name}
+                    onChange={(e) => handleChange(e, 'person')}
+                    maxLength="50"
+                  />
+                </div>
+
+                {/* Lived in Locality Since Birth */}
+                <div className="form-group checkbox-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="lived_in_locality_since_birth"
+                      checked={formData.person.lived_in_locality_since_birth || false}
+                      onChange={(e) => handleChange(e, 'person')}
+                    />
+                    Lived in Locality Since Birth
+                  </label>
+                </div>
+
+                {/* Years Lived in Locality */}
+                <div className="form-group">
+                  <label>Years Lived in Locality</label>
+                  <input
+                    type="number"
+                    name="years_lived_in_locality"
+                    value={formData.person.years_lived_in_locality}
+                    onChange={(e) => handleChange(e, 'person')}
+                    min="0"
+                  />
+                </div>
+
+                {/* Religion */}
+                <div className="form-group">
+                  <label>Religion</label>
+                  <select
+                    name="religion"
+                    value={formData.person.religion}
+                    onChange={(e) => handleChange(e, 'person')}
+                    required
+                  >
+                    <option value="">Select Religion</option>
+                    <option value="No Religion">No Religion</option>
+                    <option value="Catholic">Catholic</option>
+                    <option value="Protestant">Protestant</option>
+                    <option value="Pentecostal/Charismatic">Pentecostal/Charismatic</option>
+                    <option value="Other Christian">Other Christian</option>
+                    <option value="Islam">Islam</option>
+                    <option value="Ahmadi">Ahmadi</option>
+                    <option value="Traditionalist">Traditionalist</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                {/* Marital Status */}
+                <div className="form-group">
+                  <label>Marital Status</label>
+                  <select
+                    name="marital_status"
+                    value={formData.person.marital_status}
+                    onChange={(e) => handleChange(e, 'person')}
+                    required
+                  >
+                    <option value="">Select Marital Status</option>
+                    <option value="Never married">Never married</option>
+                    <option value="Informal/consensual union/living together">Informal/consensual union/living together</option>
+                    <option value="Married">Married</option>
+                    <option value="Separated">Separated</option>
+                    <option value="Divorced">Divorced</option>
+                    <option value="Widowed">Widowed</option>
+                  </select>
+                </div>
+
+                {/* Present on Census Night */}
+                <div className="form-group checkbox-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="present_on_census_night"
+                      checked={formData.person.present_on_census_night || false}
+                      onChange={(e) => handleChange(e, 'person')}
+                    />
+                    Present on Census Night
+                  </label>
+                </div>
+
+                {/* Status */}
+                <div className="form-group">
+                  <label>Status</label>
+                  <select
+                    name="status"
+                    value={formData.person.status}
+                    onChange={(e) => handleChange(e, 'person')}
+                    required
+                  >
+                    <option value="">Select Status</option>
+                    <option value="Usual member present">Usual member present</option>
+                    <option value="Visitor present">Visitor present</option>
+                    <option value="Usual member absent">Usual member absent</option>
+                  </select>
+                </div>
               </div>
             </div>
           )}
 
-          {/* Add similar sections for other tabs */}
+          {activeTab === 'education' && (
+  <div className="form-section">
+    <h3>Education Information</h3>
+    <div className="form-grid">
+      {/* Person ID */}
+      <div className="form-group">
+        <label>Person</label>
+        <select
+          name="person_id"
+          value={formData.education.person_id}
+          onChange={(e) => handleChange(e, 'education')}
+          required
+        >
+          <option value="">Select Person</option>
+          {bulkPerson.map(person => (
+            <option key={person.person_id} value={person.person_id}>
+              {person.full_name} (HH: {person.household_id})
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Literacy Language */}
+      <div className="form-group">
+        <label>Literacy Language</label>
+        <input
+          type="text"
+          name="literacy_language"
+          value={formData.education.literacy_language}
+          onChange={(e) => handleChange(e, 'education')}
+          maxLength="50"
+        />
+      </div>
+
+      {/* Ever Attended School */}
+      <div className="form-group checkbox-group">
+        <label>
+          <input
+            type="checkbox"
+            name="ever_attended_school"
+            checked={formData.education.ever_attended_school || false}
+            onChange={(e) => handleChange(e, 'education')}
+          />
+          Ever Attended School
+        </label>
+      </div>
+
+      {/* Highest Level of Schooling */}
+      <div className="form-group">
+        <label>Highest Level of Schooling</label>
+        <select
+          name="highest_level_schooling"
+          value={formData.education.highest_level_schooling}
+          onChange={(e) => handleChange(e, 'education')}
+          required
+        >
+          <option value="">Select Level</option>
+          <option value="Nursery">Nursery</option>
+          <option value="Kindergarten">Kindergarten</option>
+          <option value="Primary">Primary</option>
+          <option value="JSS/JHS">JSS/JHS</option>
+          <option value="Middle">Middle</option>
+          <option value="SSS/SHS">SSS/SHS</option>
+          <option value="Secondary">Secondary</option>
+          <option value="Voc/technical/commercial">Voc/technical/commercial</option>
+          <option value="Post middle/secondary certificate">Post middle/secondary certificate</option>
+          <option value="Post secondary Diploma">Post secondary Diploma</option>
+          <option value="Bachelor degree">Bachelor degree</option>
+          <option value="Post graduate">Post graduate</option>
+        </select>
+      </div>
+
+      {/* Highest Grade Completed */}
+      <div className="form-group">
+        <label>Highest Grade Completed</label>
+        <input
+          type="number"
+          name="highest_grade_completed"
+          value={formData.education.highest_grade_completed}
+          onChange={(e) => handleChange(e, 'education')}
+          min="0"
+          max="20"
+        />
+      </div>
+    </div>
+
+    {/* Add Update and Delete buttons */}
+    <div className="form-actions">
+      <button 
+        type="button" 
+        className="btn-primary"
+        onClick={() => handleSave('education')}
+      >
+        {editingEducationId ? 'Update Education' : 'Add Education'}
+      </button>
+      
+      {editingEducationId && (
+        <button 
+          type="button" 
+          className="btn-secondary"
+          onClick={() => {
+            setEditingEducationId(null);
+            setFormData(prev => ({
+              ...prev,
+              education: {
+                person_id: '',
+                literacy_language: '',
+                ever_attended_school: false,
+                highest_level_schooling: '',
+                highest_grade_completed: ''
+              }
+            }));
+          }}
+        >
+          Cancel Edit
+        </button>
+      )}
+    </div>
+  </div>
+)}
+
+
+
+
+ 
+
+
 
           <div className="form-actions">
             <button
@@ -1087,6 +1594,8 @@ const handleTabChange = (tab) => {
         <table>
           <thead>
             <tr>
+               <th>Structure number</th>
+              <th>Household number</th>
               <th>Household ID</th>
               <th>Dwelling Type</th>
               <th>Roof Material</th>
@@ -1094,12 +1603,15 @@ const handleTabChange = (tab) => {
               <th>Floor Material</th>
               <th>Toilet Facility</th>
               <th>Water Source</th>
-              <th>Action</th>
+              <th>Update</th>
+               <th>Delete</th>
             </tr>
           </thead>
           <tbody>
             {bulkHousing.map(housing => (
               <tr key={housing.housing_id}>
+                <td>{housing.structure_number}</td>
+                <td>{housing.household_number}</td>
                 <td>{housing.household_id}</td>
                 <td>{housing.dwelling_type}</td>
                 <td>{housing.roof_material}</td>
@@ -1109,8 +1621,18 @@ const handleTabChange = (tab) => {
                 <td>{housing.drinking_water_source}</td>
                 <td>
                   <button
+                    onClick={() => handleUpdate(housing.housing_id)}
+                    className="delete-button"
+                    style={{ backgroundColor: 'green' }}
+                  >
+                    Update
+                  </button>
+                </td>
+                <td>
+                  <button
                     onClick={() => handleDelete('housing', housing.housing_id)}
                     className="delete-button"
+                   
                   >
                     Delete
                   </button>
@@ -1123,6 +1645,117 @@ const handleTabChange = (tab) => {
     </div>
   </>
           )}
+
+          {activeTab === 'person' && (
+  <>
+    <div className="data-table">
+      <h4>Existing Persons</h4>
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Household ID</th>
+              <th>Relationship</th>
+              <th>Sex</th>
+              <th>Age</th>
+              <th>Nationality</th>
+              <th>Marital Status</th>
+              <th>Status</th>
+              <th>Update</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bulkPerson.map(person => (
+              <tr key={person.person_id}>
+                <td>{person.full_name}</td>
+                <td>{person.household_id}</td>
+                <td>{person.relationship_to_head}</td>
+                <td>{person.sex}</td>
+                <td>{person.age}</td>
+                <td>{person.nationality}</td>
+                <td>{person.marital_status}</td>
+                <td>{person.status}</td>
+               
+
+
+              <td>
+                  <button
+                    onClick={() => handleUpdate(person.person_id)}
+                    className="delete-button"
+                    style={{ backgroundColor: 'green' }}
+                  >
+                    Update
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleDelete('person', person.person_id)}
+                    className="delete-button"
+                   
+                  >
+                    Delete
+                  </button>
+                </td>
+
+
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </>
+        )}
+
+        {activeTab === 'education' && (
+  <>
+    <div className="data-table">
+      <h4>Existing Education Records</h4>
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Person Name</th>
+              <th>Literacy Language</th>
+              <th>Attended School</th>
+              <th>Highest Level</th>
+              <th>Highest Grade</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bulkEducation.map(education => (
+              <tr key={education.education_id}>
+                <td>{education.full_name}</td>
+                <td>{education.literacy_language || 'N/A'}</td>
+                <td>{education.ever_attended_school ? 'Yes' : 'No'}</td>
+                <td>{education.highest_level_schooling}</td>
+                <td>{education.highest_grade_completed || 'N/A'}</td>
+                <td>
+                  <button
+                    onClick={() => handleEdit('education', education)}
+                    className="edit-button"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete('education', education.education_id)}
+                    className="delete-button"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </>
+)}
+
 
 
 

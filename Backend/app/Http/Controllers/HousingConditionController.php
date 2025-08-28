@@ -52,38 +52,50 @@ class HousingConditionController extends Controller
         return response()->json($housingCondition[0]);
     }
 
-    public function update(Request $request, $id)
-    {
-        $validated = $this->validateHousingCondition($request);
+public function update(Request $request, $id)
+{
+    // First get the current record
+    $current = DB::select('CALL sp_get_housing_condition(?)', [$id]);
+    if (empty($current)) {
+        return response()->json(['error' => 'Record not found'], 404);
+    }
 
-        DB::select('CALL sp_update_housing_condition(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-            $id,
-            $validated['household_id'],
-            $validated['dwelling_type'],
-            $validated['outer_wall_material'],
-            $validated['floor_material'],
-            $validated['roof_material'],
-            $validated['tenure_arrangement'],
-            $validated['ownership_type'],
-            $validated['total_rooms'] ?? null,
-            $validated['sleeping_rooms'] ?? null,
-            $validated['shared_sleeping_rooms'] ?? false,
-            $validated['households_sharing_sleeping_rooms'] ?? null,
-            $validated['lighting_source'],
-            $validated['drinking_water_source'],
-            $validated['other_water_source'],
-            $validated['cooking_fuel'],
-            $validated['cooking_space'],
-            $validated['bathing_facility'],
-            $validated['toilet_facility'],
-            $validated['shared_toilet'] ?? false,
-            $validated['households_sharing_toilet'] ?? null,
-            $validated['solid_waste_disposal'],
-            $validated['liquid_waste_disposal']
-        ]);
+    // Define all possible fields that can be updated
+    $updatableFields = [
+        'household_id', 'dwelling_type', 'outer_wall_material', 'floor_material', 'roof_material',
+        'tenure_arrangement', 'ownership_type', 'total_rooms', 'sleeping_rooms', 'shared_sleeping_rooms',
+        'households_sharing_sleeping_rooms', 'lighting_source', 'drinking_water_source', 'other_water_source',
+        'cooking_fuel', 'cooking_space', 'bathing_facility', 'toilet_facility', 'shared_toilet',
+        'households_sharing_toilet', 'solid_waste_disposal', 'liquid_waste_disposal'
+    ];
 
+    // Build the dynamic UPDATE query
+    $setClauses = [];
+    $params = [];
+
+    foreach ($updatableFields as $field) {
+        if (!$request->filled($field)) {
+            continue;
+        }
+
+        $value = $request->$field;
+        $setClauses[] = "{$field} = ?";
+        $params[] = $value;
+    }
+
+    // If no fields to update, return current data
+    if (empty($setClauses)) {
         return $this->show($id);
     }
+
+    $query = 'UPDATE HousingCondition SET ' . implode(', ', $setClauses) . ' WHERE housing_id = ?';
+    $params[] = $id;
+
+    // Execute the update
+    DB::update($query, $params);
+
+    return $this->show($id);
+}
 
     public function destroy($id)
     {

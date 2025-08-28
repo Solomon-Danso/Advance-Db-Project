@@ -26,13 +26,11 @@ Route::put('/households/{id}', [App\Http\Controllers\HouseholdController::class,
 Route::delete('/deletehouseholds/{id}', [App\Http\Controllers\HouseholdController::class, 'destroy']);
 
 Route::apiResource('housing-conditions', App\Http\Controllers\HousingConditionController::class);
+Route::apiResource('persons', App\Http\Controllers\PersonController::class);
+Route::get('persons/household/{household_id}', [App\Http\Controllers\PersonController::class, 'getByHousehold']);
 
-// Person Routes
-Route::get('/persons', [App\Http\Controllers\PersonController::class, 'index']);
-Route::post('/persons', [App\Http\Controllers\PersonController::class, 'store']);
-Route::get('/persons/{id}', [App\Http\Controllers\PersonController::class, 'show']);
-Route::put('/persons/{id}', [App\Http\Controllers\PersonController::class, 'update']);
-Route::delete('/persons/{id}', [App\Http\Controllers\PersonController::class, 'destroy']);
+Route::apiResource('education', App\Http\Controllers\EducationController::class);
+Route::get('education/person/{person_id}', [App\Http\Controllers\EducationController::class, 'getByPerson']);
 
 // Housing Condition Routes
 Route::get('/households/{householdId}/housing-condition', [App\Http\Controllers\HousingConditionController::class, 'show']);
