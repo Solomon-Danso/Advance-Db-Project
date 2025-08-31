@@ -12,23 +12,6 @@ CREATE TABLE District (
     FOREIGN KEY (region_code) REFERENCES Region(region_code)
 );
 
-DELIMITER //
-
-CREATE PROCEDURE sp_get_all_district()
-    
-Begin 
-	select * from District; 
-END //
-
-DELIMITER //
-
-CREATE PROCEDURE sp_delete_District( IN p_district_code varchar(20))
-
-Begin 
- Delete from District where district_code = p_district_code;
- Delete from SubDistrict where district_code = p_district_code;
- 
- end //
 
 CREATE TABLE SubDistrict (
     sub_district_code VARCHAR(10) PRIMARY KEY,

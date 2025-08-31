@@ -177,6 +177,8 @@ const handleSubmit = async (e, section) => {
     showToast(errorMessage, 'error');
   } finally {
     setLoading(false);
+    loadTabData(activeTab);
+    //window.location.reload();
   }
 };
 
@@ -249,15 +251,17 @@ const handleSubmit = async (e, section) => {
 
 
       await apiClient.request('DELETE', endpoint);
+      loadTabData(activeTab);
       showToast(`${section.charAt(0).toUpperCase() + section.slice(1)} deleted successfully!`);
       
     } catch (error) {
       console.error('Error deleting data:', error);
       showToast(error.response?.data?.message || 'Failed to delete data', 'error');
     } finally {
+      loadTabData(activeTab);
       householdData()
       setLoading(false);
-      
+    
     }
   };
 
@@ -424,7 +428,7 @@ const handleSubmit = async (e, section) => {
                     <th>Code</th>
                     <th>Name</th>
                     <th>Type</th>
-                    <th>Region</th>
+                    <th>Region Code</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -434,7 +438,7 @@ const handleSubmit = async (e, section) => {
                       <td>{district.district_code}</td>
                       <td>{district.district_name}</td>
                       <td>{district.district_type}</td>
-                      <td>{district.region_name}</td>
+                      <td>{district.region_code}</td>
                       <td>
                         <button
                           onClick={() => handleDelete('district', district.district_code)}

@@ -39,9 +39,13 @@ class HouseholdController extends Controller
     public function show($id)
     {
         $household = DB::select('CALL sp_get_household_with_members(?)', [$id]);
+
+        // $household = Household::where("household_id", $id)->first();
+
+
         return response()->json($household[0]);
     }
-
+ 
     public function update(Request $request, $id)
     {
         $validated = $this->validateHousehold($request);

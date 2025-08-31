@@ -8,6 +8,9 @@ use Illuminate\Validation\Rule;
 
 class GeographicController extends Controller
 {
+
+//CRUD
+//create read update delete
     // REGION METHODS
     public function getRegions()
     {
@@ -22,7 +25,7 @@ class GeographicController extends Controller
 public function createRegion(Request $request)
 {
     try {
-        \Log::info('Creating region with data:', $request->all());
+        // \Log::info('Creating region with data:', $request->all());
 
         $validated = $request->validate([
             'region_code' => 'required|string|max:2|unique:Region,region_code',
@@ -90,6 +93,52 @@ public function createRegion(Request $request)
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function updateRegion(Request $request, $id)
+{
+    // First get the current record
+    $current = DB::select('CALL sp_update_region(?)', [$id]);
+    if (empty($current)) {
+        return response()->json(['error' => 'Record not found'], 404);
+    }
+
+    // Define all possible fields that can be updated
+    $updatableFields = [
+        'region_code', 'region_name'
+    ];
+
+    // Build the dynamic UPDATE query
+    $setClauses = [];
+    $params = [];
+
+    foreach ($updatableFields as $field) {
+        if (!$request->filled($field)) {
+            continue;
+        }
+
+        $value = $request->$field;
+        $setClauses[] = "{$field} = ?";
+        $params[] = $value;
+    }
+
+    // If no fields to update, return current data
+    if (empty($setClauses)) {
+         return response()->json([
+        'success' => true,
+              ], 200);
+    }
+
+    $query = 'UPDATE Region SET ' . implode(', ', $setClauses) . ' WHERE region_code = ?';
+    $params[] = $id;
+
+    // Execute the update
+    DB::update($query, $params);
+
+     return response()->json([
+        'success' => true,
+        'message' => "Region Updated Successfully",   // send user-friendly message
+         ], 200);
+}
 
     // DISTRICT METHODS
     public function getDistricts()

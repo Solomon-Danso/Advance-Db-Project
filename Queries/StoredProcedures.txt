@@ -1,5 +1,5 @@
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_District`( IN p_district_code varchar(20))
+CREATE  PROCEDURE `sp_delete_District`( IN p_district_code varchar(20))
 Begin 
  Delete from District where district_code = p_district_code;
  Delete from SubDistrict where district_code = p_district_code;
@@ -8,49 +8,49 @@ Begin
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_agricultural_activity`(IN p_agriculture_id INT)
+CREATE  PROCEDURE `sp_delete_agricultural_activity`(IN p_agriculture_id INT)
 BEGIN
     DELETE FROM AgriculturalActivity WHERE agriculture_id = p_agriculture_id;
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_disability`(IN p_disability_id INT)
+CREATE  PROCEDURE `sp_delete_disability`(IN p_disability_id INT)
 BEGIN
     DELETE FROM Disability WHERE disability_id = p_disability_id;
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_economic_activity`(IN p_activity_id INT)
+CREATE  PROCEDURE `sp_delete_economic_activity`(IN p_activity_id INT)
 BEGIN
     DELETE FROM EconomicActivity WHERE activity_id = p_activity_id;
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_education`(IN p_education_id INT)
+CREATE  PROCEDURE `sp_delete_education`(IN p_education_id INT)
 BEGIN
     DELETE FROM Education WHERE education_id = p_education_id;
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_enumerationarea`(IN `p_ea_code` VARCHAR(20))
+CREATE  PROCEDURE `sp_delete_enumerationarea`(IN `p_ea_code` VARCHAR(20))
 Begin 
 DELETE from enumeration_area where ea_code = p_ea_code;
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_fertility`(IN p_fertility_id INT)
+CREATE  PROCEDURE `sp_delete_fertility`(IN p_fertility_id INT)
 BEGIN
     DELETE FROM Fertility WHERE fertility_id = p_fertility_id;
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_household`( IN p_household_id int)
+CREATE  PROCEDURE `sp_delete_household`( IN p_household_id int)
 Begin 
 DELETE from Household where household_id = p_household_id;
 
@@ -58,14 +58,14 @@ End//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_housing_condition`(IN p_housing_id INT)
+CREATE  PROCEDURE `sp_delete_housing_condition`(IN p_housing_id INT)
 BEGIN
     DELETE FROM HousingCondition WHERE housing_id = p_housing_id;
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_locality`(
+CREATE  PROCEDURE `sp_delete_locality`(
 IN p_locality_code varchar(20)
 
 
@@ -78,14 +78,14 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_person`(IN p_person_id INT)
+CREATE  PROCEDURE `sp_delete_person`(IN p_person_id INT)
 BEGIN
     DELETE FROM Person WHERE person_id = p_person_id;
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_region`(IN `p_region_code` VARCHAR(20))
+CREATE  PROCEDURE `sp_delete_region`(IN `p_region_code` VARCHAR(20))
 BEGIN
 	Delete from Region where region_code = p_region_code;
     Delete from District where region_code = p_region_code;
@@ -93,7 +93,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_delete_subdistrict`(
+CREATE  PROCEDURE `sp_delete_subdistrict`(
 in p_sub_district_code varchar(20)
 )
 Begin 
@@ -103,7 +103,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_agricultural_activities_by_household`(IN p_household_id INT)
+CREATE  PROCEDURE `sp_get_agricultural_activities_by_household`(IN p_household_id INT)
 BEGIN
     SELECT 
         aa.*,
@@ -118,7 +118,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_agricultural_activity`(IN p_agriculture_id INT)
+CREATE  PROCEDURE `sp_get_agricultural_activity`(IN p_agriculture_id INT)
 BEGIN
     SELECT 
         aa.*,
@@ -132,7 +132,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_all_agricultural_activities`()
+CREATE  PROCEDURE `sp_get_all_agricultural_activities`()
 BEGIN
     SELECT 
         aa.*,
@@ -146,7 +146,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_all_disabilities`()
+CREATE  PROCEDURE `sp_get_all_disabilities`()
 BEGIN
     SELECT 
         d.*,
@@ -159,14 +159,14 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_all_district`()
+CREATE  PROCEDURE `sp_get_all_district`()
 Begin 
 	select * from District; 
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_all_economic_activities`()
+CREATE  PROCEDURE `sp_get_all_economic_activities`()
 BEGIN
     SELECT 
         ea.*,
@@ -179,7 +179,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_all_educations`()
+CREATE  PROCEDURE `sp_get_all_educations`()
 BEGIN
     SELECT 
         e.*,
@@ -192,7 +192,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_all_fertilities`()
+CREATE  PROCEDURE `sp_get_all_fertilities`()
 BEGIN
     SELECT 
         f.*,
@@ -205,8 +205,67 @@ BEGIN
 END//
 DELIMITER ;
 
+
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_all_households`()
+
+CREATE PROCEDURE `sp_get_all_by_cursor_fertilities`()
+BEGIN
+    -- Declare variables to hold cursor values
+    DECLARE v_fertility_id INT;
+    DECLARE v_person_id INT;
+    DECLARE v_other_fertility_columns VARCHAR(255); -- replace with actual column types
+    DECLARE v_full_name VARCHAR(255);
+    DECLARE v_household_id INT;
+    DECLARE v_sex CHAR(1);
+    
+    -- Declare a cursor for the SELECT statement
+    DECLARE fertility_cursor CURSOR FOR
+        SELECT 
+            f.fertility_id,
+            f.person_id,
+            f.other_column,  -- replace with your actual fertility columns
+            p.full_name,
+            p.household_id,
+            p.sex
+        FROM Fertility f
+        JOIN Person p ON f.person_id = p.person_id
+        ORDER BY f.fertility_id DESC;
+    
+    -- Declare a handler for end of cursor
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    
+    -- Open cursor
+    OPEN fertility_cursor;
+    
+    read_loop: LOOP
+        FETCH fertility_cursor INTO v_fertility_id, v_person_id, v_other_fertility_columns, v_full_name, v_household_id, v_sex;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+        
+        -- Here you can do something with the fetched values
+        -- For example, you can SELECT them one by one
+        SELECT 
+            v_fertility_id AS fertility_id,
+            v_person_id AS person_id,
+            v_other_fertility_columns AS other_column,
+            v_full_name,
+            v_household_id,
+            v_sex;
+    END LOOP;
+    
+    -- Close cursor
+    CLOSE fertility_cursor;
+END//
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+CREATE  PROCEDURE `sp_get_all_households`()
 Begin 
  SELECT * from Household; 
  
@@ -214,7 +273,7 @@ End//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_all_housing_conditions`()
+CREATE  PROCEDURE `sp_get_all_housing_conditions`()
 BEGIN
     SELECT 
         hc.*,
@@ -228,7 +287,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_all_localities`()
+CREATE  PROCEDURE `sp_get_all_localities`()
 Begin 
  select * from Locality; 
  
@@ -236,7 +295,7 @@ Begin
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_all_persons`()
+CREATE  PROCEDURE `sp_get_all_persons`()
 BEGIN
     SELECT 
         p.*,
@@ -250,14 +309,14 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_all_regions`()
+CREATE  PROCEDURE `sp_get_all_regions`()
 BEGIN
     SELECT * FROM Region ORDER BY region_code;
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_disabilities_by_person`(IN p_person_id INT)
+CREATE  PROCEDURE `sp_get_disabilities_by_person`(IN p_person_id INT)
 BEGIN
     SELECT 
         d.*,
@@ -271,7 +330,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_disability`(IN p_disability_id INT)
+CREATE  PROCEDURE `sp_get_disability`(IN p_disability_id INT)
 BEGIN
     SELECT 
         d.*,
@@ -284,7 +343,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_economic_activities_by_person`(IN p_person_id INT)
+CREATE  PROCEDURE `sp_get_economic_activities_by_person`(IN p_person_id INT)
 BEGIN
     SELECT 
         ea.*,
@@ -298,7 +357,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_economic_activity`(IN p_activity_id INT)
+CREATE  PROCEDURE `sp_get_economic_activity`(IN p_activity_id INT)
 BEGIN
     SELECT 
         ea.*,
@@ -311,7 +370,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_education`(IN p_education_id INT)
+CREATE  PROCEDURE `sp_get_education`(IN p_education_id INT)
 BEGIN
     SELECT 
         e.*,
@@ -324,7 +383,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_educations_by_person`(IN p_person_id INT)
+CREATE  PROCEDURE `sp_get_educations_by_person`(IN p_person_id INT)
 BEGIN
     SELECT 
         e.*,
@@ -338,14 +397,14 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_enumerationarea`()
+CREATE  PROCEDURE `sp_get_enumerationarea`()
 Begin 
 select * from enumeration_area;
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_fertilities_by_person`(IN p_person_id INT)
+CREATE  PROCEDURE `sp_get_fertilities_by_person`(IN p_person_id INT)
 BEGIN
     SELECT 
         f.*,
@@ -360,7 +419,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_fertility`(IN p_fertility_id INT)
+CREATE  PROCEDURE `sp_get_fertility`(IN p_fertility_id INT)
 BEGIN
     SELECT 
         f.*,
@@ -374,7 +433,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_household_members`(IN p_household_id INT)
+CREATE  PROCEDURE `sp_get_household_members`(IN p_household_id INT)
 BEGIN
     DECLARE done INT DEFAULT FALSE;
     DECLARE v_person_id INT;
@@ -416,7 +475,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_household_with_members`(
+CREATE  PROCEDURE `sp_get_household_with_members`(
     IN p_household_id int 
     )
 Begin 
@@ -426,7 +485,7 @@ Begin
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_housing_condition`(IN p_housing_id INT)
+CREATE  PROCEDURE `sp_get_housing_condition`(IN p_housing_id INT)
 BEGIN
     SELECT 
         hc.*,
@@ -440,7 +499,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_housing_conditions_by_household`(IN p_household_id INT)
+CREATE  PROCEDURE `sp_get_housing_conditions_by_household`(IN p_household_id INT)
 BEGIN
     SELECT * FROM HousingCondition 
     WHERE household_id = p_household_id
@@ -449,7 +508,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_person`(IN p_person_id INT)
+CREATE  PROCEDURE `sp_get_person`(IN p_person_id INT)
 BEGIN
     SELECT 
         p.*,
@@ -463,7 +522,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_persons_by_household`(IN p_household_id INT)
+CREATE  PROCEDURE `sp_get_persons_by_household`(IN p_household_id INT)
 BEGIN
     SELECT * FROM Person 
     WHERE household_id = p_household_id
@@ -479,14 +538,14 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_get_subdistricts`()
+CREATE  PROCEDURE `sp_get_subdistricts`()
 Begin 
 	select * from SubDistrict;
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_agricultural_activity`(
+CREATE  PROCEDURE `sp_insert_agricultural_activity`(
     IN p_household_id INT,
     IN p_engaged_in_agriculture BOOLEAN,
     IN p_crop_farming BOOLEAN,
@@ -511,7 +570,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_disability`(
+CREATE  PROCEDURE `sp_insert_disability`(
     IN p_person_id INT,
     IN p_has_disability BOOLEAN,
     IN p_sight_disability BOOLEAN,
@@ -544,7 +603,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_district`(
+CREATE  PROCEDURE `sp_insert_district`(
     In p_district_code varchar(20),
     in p_region_code varchar(20),
     in p_district_name varchar(20),
@@ -557,7 +616,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_economic_activity`(
+CREATE  PROCEDURE `sp_insert_economic_activity`(
     IN p_person_id INT,
     IN p_engaged_in_activity BOOLEAN,
     IN p_engagement_status ENUM('Did not work but had job to go back to', 'Worked before, seeking work and available', 'Seeking work for the first time and available', 'Did voluntary work without pay', 'Did not work and not seeking work'),
@@ -589,7 +648,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_education`(
+CREATE  PROCEDURE `sp_insert_education`(
     IN p_person_id INT,
     IN p_literacy_language VARCHAR(50),
     IN p_ever_attended_school BOOLEAN,
@@ -611,14 +670,14 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_enumerationarea`(IN `p_ea_code` VARCHAR(20), IN `p_locality_code` VARCHAR(20), IN `p_ea_type` VARCHAR(20), IN `p_ea_number` VARCHAR(20))
+CREATE  PROCEDURE `sp_insert_enumerationarea`(IN `p_ea_code` VARCHAR(20), IN `p_locality_code` VARCHAR(20), IN `p_ea_type` VARCHAR(20), IN `p_ea_number` VARCHAR(20))
 Begin 
 insert into enumeration_area(ea_code,locality_code,ea_type,ea_number) values (p_ea_code, p_locality_code, p_ea_type, p_ea_number); 
 END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_fertility`(
+CREATE  PROCEDURE `sp_insert_fertility`(
     IN p_person_id INT,
     IN p_children_ever_born_male INT,
     IN p_children_ever_born_female INT,
@@ -644,7 +703,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_household`(
+CREATE  PROCEDURE `sp_insert_household`(
     IN p_ea_code VARCHAR(10),
     IN p_structure_number VARCHAR(20),
     IN p_household_number VARCHAR(20),
@@ -675,7 +734,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_housing_condition`(
+CREATE  PROCEDURE `sp_insert_housing_condition`(
     IN p_household_id INT,
     IN p_dwelling_type ENUM('Separate house', 'Semi-detached house', 'Flat/Apartment', 'Compound house', 'Huts/Buildings (same compound)', 'Huts/Buildings (different compounds)', 'Tent', 'Improvised home', 'Living quarters attached to office/shop', 'Uncompleted building', 'Other'),
     IN p_outer_wall_material ENUM('Mud bricks/earth', 'Wood', 'Metal sheet/slate/asbestos', 'Stone', 'Burnt bricks', 'Cement blocks/concrete', 'Landcrete', 'Bamboo', 'Palm leaves/Thatch (grass)/Raffia', 'Other'),
@@ -720,7 +779,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_locality`(
+CREATE  PROCEDURE `sp_insert_locality`(
 IN p_locality_code varchar(20),
 IN p_sub_district_code varchar(20),
 IN p_locality_name varchar(100)
@@ -733,7 +792,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_person`(
+CREATE  PROCEDURE `sp_insert_person`(
     IN p_household_id INT,
     IN p_full_name VARCHAR(100),
     IN p_relationship_to_head ENUM('Head', 'Spouse', 'Child', 'Parent/Parent in-law', 'Son/Daughter in-law', 'Grandchild', 'Brother/Sister', 'Step child', 'Foster child', 'Other relative', 'Non-relative'),
@@ -772,11 +831,13 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_region`(
+CREATE PROCEDURE `sp_insert_region`(
     IN p_region_code VARCHAR(20),
     IN p_region_name VARCHAR(20)
    
 )
+
+
 BEGIN
     INSERT INTO Region (
         region_code, region_name
@@ -788,7 +849,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_insert_subdistrict`(
+CREATE  PROCEDURE `sp_insert_subdistrict`(
 IN p_sub_district_code varchar(20),
 IN p_district_code varchar(20),
 In p_sub_district_name varchar(250)
@@ -800,7 +861,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_update_education`(
+CREATE  PROCEDURE `sp_update_education`(
     IN p_education_id INT,
     IN p_person_id INT,
     IN p_literacy_language VARCHAR(50),
@@ -821,7 +882,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_update_housing_condition`(IN `p_housing_id` INT, IN `p_household_id` INT, IN `p_dwelling_type` ENUM('Separate house','Semi-detached house','Flat/Apartment','Compound house','Huts/Buildings (same compound)','Huts/Buildings (different compounds)','Tent','Improvised home','Living quarters attached to office/shop','Uncompleted building','Other'), IN `p_outer_wall_material` ENUM('Mud bricks/earth','Wood','Metal sheet/slate/asbestos','Stone','Burnt bricks','Cement blocks/concrete','Landcrete','Bamboo','Palm leaves/Thatch (grass)/Raffia','Other'), IN `p_floor_material` ENUM('Earth/Mud','Cement/Concrete','Stone','Burnt bricks','Wood','Vinyl tiles','Ceramic/Porcelain/Granite/Marble tiles','Terrazzo/Terrazzo tiles','Other'), IN `p_roof_material` ENUM('Mud/Mud bricks/Earth','Wood','Metal sheet','Slate/Asbestos','Cement/Concrete','Roofing Tiles','Bamboo','Thatch/Palm leaves or Raffia','Other'), IN `p_tenure_arrangement` ENUM('Owner occupied','Rent free','Perching','Squatting','Other'), IN `p_ownership_type` ENUM('Owned by household member','Being purchased','Relative not household member','Other private individual','Private employer','Other private agency','Public/Government ownership','Other'), IN `p_total_rooms` INT, IN `p_sleeping_rooms` INT, IN `p_shared_sleeping_rooms` TINYINT, IN `p_households_sharing_sleeping_rooms` INT, IN `p_lighting_source` ENUM('Electricity (main)','Electricity (private generator)','Kerosene lamp','Gas lamp','Solar energy','Candle','Flashlight/Torch','Firewood','Crop residue','Other'), IN `p_drinking_water_source` ENUM('Pipe-borne inside dwelling','Pipe-borne outside dwelling','Public tap/Standpipe','Borehole/Pump/Tube well','Protected well','Rain water','Protected spring','Bottled water','Sachet water','Tanker supply/Vendor provided','Unprotected well','Unprotected spring','River/Stream','Dugout/Pond/Lake/Dam/Canal','Other'), IN `p_other_water_source` ENUM('Pipe-borne inside dwelling','Pipe-borne outside dwelling','Public tap/Standpipe','Borehole/Pump/Tube well','Protected well','Rain water','Protected spring','Tanker supply/Vendor provided','Unprotected well','Unprotected spring','River/Stream','Dugout/Pond/Lake/Dam/Canal','Other'), IN `p_cooking_fuel` ENUM('None, no cooking','Wood','Gas','Electricity','Kerosene','Charcoal','Crop residue','Saw dust','Animal waste','Other'), IN `p_cooking_space` ENUM('No cooking','Separate room for exclusive use of household','Separate room shared with other household(s)','Enclosure without roof','Structure with roof but without walls','Bedroom/Hall/Living room','Veranda','Open space in compound','Other'), IN `p_bathing_facility` ENUM('Own bathroom for exclusive use','Shared separate bathroom in same house','Private open cubicle','Shared open cubicle','Public bath house','Bathroom in another house','Open space around house','In a river, pond, lake or dam','Other'), IN `p_toilet_facility` ENUM('No facility','WC','Pit latrine','KVIP','Bucket/Pan','Public toilet','Other'), IN `p_shared_toilet` TINYINT, IN `p_households_sharing_toilet` INT, IN `p_solid_waste_disposal` ENUM('Collected','Burned by household','Public dump (Container)','Public dump (Open space)','Dumped indiscriminately','Buried by household','Other'), IN `p_liquid_waste_disposal` ENUM('Through the sewage system','Through drainage system into a gutter','Through drainage into a pit (soak away)','Thrown onto the street/outside','Thrown into gutter','Thrown onto compound','Other'))
+CREATE  PROCEDURE `sp_update_housing_condition`(IN `p_housing_id` INT, IN `p_household_id` INT, IN `p_dwelling_type` ENUM('Separate house','Semi-detached house','Flat/Apartment','Compound house','Huts/Buildings (same compound)','Huts/Buildings (different compounds)','Tent','Improvised home','Living quarters attached to office/shop','Uncompleted building','Other'), IN `p_outer_wall_material` ENUM('Mud bricks/earth','Wood','Metal sheet/slate/asbestos','Stone','Burnt bricks','Cement blocks/concrete','Landcrete','Bamboo','Palm leaves/Thatch (grass)/Raffia','Other'), IN `p_floor_material` ENUM('Earth/Mud','Cement/Concrete','Stone','Burnt bricks','Wood','Vinyl tiles','Ceramic/Porcelain/Granite/Marble tiles','Terrazzo/Terrazzo tiles','Other'), IN `p_roof_material` ENUM('Mud/Mud bricks/Earth','Wood','Metal sheet','Slate/Asbestos','Cement/Concrete','Roofing Tiles','Bamboo','Thatch/Palm leaves or Raffia','Other'), IN `p_tenure_arrangement` ENUM('Owner occupied','Rent free','Perching','Squatting','Other'), IN `p_ownership_type` ENUM('Owned by household member','Being purchased','Relative not household member','Other private individual','Private employer','Other private agency','Public/Government ownership','Other'), IN `p_total_rooms` INT, IN `p_sleeping_rooms` INT, IN `p_shared_sleeping_rooms` TINYINT, IN `p_households_sharing_sleeping_rooms` INT, IN `p_lighting_source` ENUM('Electricity (main)','Electricity (private generator)','Kerosene lamp','Gas lamp','Solar energy','Candle','Flashlight/Torch','Firewood','Crop residue','Other'), IN `p_drinking_water_source` ENUM('Pipe-borne inside dwelling','Pipe-borne outside dwelling','Public tap/Standpipe','Borehole/Pump/Tube well','Protected well','Rain water','Protected spring','Bottled water','Sachet water','Tanker supply/Vendor provided','Unprotected well','Unprotected spring','River/Stream','Dugout/Pond/Lake/Dam/Canal','Other'), IN `p_other_water_source` ENUM('Pipe-borne inside dwelling','Pipe-borne outside dwelling','Public tap/Standpipe','Borehole/Pump/Tube well','Protected well','Rain water','Protected spring','Tanker supply/Vendor provided','Unprotected well','Unprotected spring','River/Stream','Dugout/Pond/Lake/Dam/Canal','Other'), IN `p_cooking_fuel` ENUM('None, no cooking','Wood','Gas','Electricity','Kerosene','Charcoal','Crop residue','Saw dust','Animal waste','Other'), IN `p_cooking_space` ENUM('No cooking','Separate room for exclusive use of household','Separate room shared with other household(s)','Enclosure without roof','Structure with roof but without walls','Bedroom/Hall/Living room','Veranda','Open space in compound','Other'), IN `p_bathing_facility` ENUM('Own bathroom for exclusive use','Shared separate bathroom in same house','Private open cubicle','Shared open cubicle','Public bath house','Bathroom in another house','Open space around house','In a river, pond, lake or dam','Other'), IN `p_toilet_facility` ENUM('No facility','WC','Pit latrine','KVIP','Bucket/Pan','Public toilet','Other'), IN `p_shared_toilet` TINYINT, IN `p_households_sharing_toilet` INT, IN `p_solid_waste_disposal` ENUM('Collected','Burned by household','Public dump (Container)','Public dump (Open space)','Dumped indiscriminately','Buried by household','Other'), IN `p_liquid_waste_disposal` ENUM('Through the sewage system','Through drainage system into a gutter','Through drainage into a pit (soak away)','Thrown onto the street/outside','Thrown into gutter','Thrown onto compound','Other'))
 BEGIN
     UPDATE HousingCondition 
     SET 
@@ -852,7 +913,7 @@ END//
 DELIMITER ;
 
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_update_person`(
+CREATE  PROCEDURE `sp_update_person`(
     IN p_person_id INT,
     IN p_household_id INT,
     IN p_full_name VARCHAR(100),

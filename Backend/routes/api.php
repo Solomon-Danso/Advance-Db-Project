@@ -89,6 +89,8 @@ Route::prefix('geographic')->group(function () {
     Route::get('/regions', [App\Http\Controllers\GeographicController::class, 'getRegions']);
     Route::post('/regions', [App\Http\Controllers\GeographicController::class, 'createRegion']);
     Route::delete('/regions/{regionCode}', [App\Http\Controllers\GeographicController::class, 'deleteRegion']);
+    Route::put('/regions/{regionCode}', [App\Http\Controllers\GeographicController::class, 'deleteRegion']);
+
 
     // District Routes
     Route::get('/districts', [App\Http\Controllers\GeographicController::class, 'getDistricts']);
